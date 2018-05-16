@@ -12,7 +12,7 @@ contract('XchngToken', async (accounts) => {
     const recipient = accounts[1];
     const anotherAccount = accounts[2];
 
-    // Reinitialize XchngToken before each test ( Runs befor each "it" )
+    // Reinitialize XchngToken before each test ( Runs befor each test )
     beforeEach(async function (){
         // Create the token with the preallocated supply and add all the tokens to 
         // account 0 ( owner for testing )
@@ -91,10 +91,11 @@ contract('XchngToken', async (accounts) => {
     });
     // Test approve from one account to another
     describe('approve()', function () {
-        const spender = recipient;
-        const amount  = 10;
         // valid address  
         describe('when the spender is not the zero address', function () {
+            const spender = recipient;
+            const amount  = 10;
+            // no account balance, assuming "anotherAccount" has not account balance
             describe('when the sender does not have enough of a balance', function() {
                 it('emits an approval event', async function() {
                     const { logs } = await this.token.approve(spender, amount, {from: anotherAccount});
@@ -104,28 +105,33 @@ contract('XchngToken', async (accounts) => {
                     assert.equal(logs[0].args._spender,spender);
                     assert(logs[0].args._value.eq(amount));
                 });
-            });
-            describe('when there was no approved amount before', function() {
-                it('approves the requested amount', async function() {
-                    await this.token.approve(spender,amount, { from: ownerAddress }); 
-                    const allowance = await this.token.allowance(ownerAddress,spender);
-                    assert.equal(allowance, amount);
+                describe('when there was no approved amount before', function() {
+                    it('approves the requested amount', async function() {
+                        await this.token.approve(spender,amount, { from: anotherAccount }); 
+                        const allowance = await this.token.allowance(anotherAccount,spender);
+                        assert.equal(allowance, amount);
+                    });
+                });
+                describe('when the spender had an approved amount', function() {
+                    it('approves the requested amount and replaces the previous one', async function() {
+                        // set the first approved amount to 1
+                        await this.token.approve(spender,1, {from: anotherAccount});
+                        // check to make sure the first approval is set
+                        const allowance1 = await this.token.allowance(anotherAccount, spender);
+                        assert.equal(allowance1,1);
+                        // then replace the approve with a new value 
+                        await this.token.approve(spender,amount,{from: anotherAccount});
+                        const allowance2 = await this.token.allowance(anotherAccount, spender);
+                        assert.equal(allowance2,amount);
+                    });
                 });
             });
-            describe('when the spender had an approved amount', function() {
-                it('approves the requested amount and replaces the previous one', async function() {
-                    // set the first approved amount to 1
-                    await this.token.approve(spender,1, {from: ownerAddress});
-                    // check to make sure the first approval is set
-                    const allowance1 = await this.token.allowance(ownerAddress, spender);
-                    assert.equal(allowance1,1);
-                    // then replace the approve with a new value 
-                    await this.token.approve(spender,amount,{from: ownerAddress});
-                    const allowance2 = await this.token.allowance(ownerAddress, spender);
-                    assert.equal(allowance2,amount);
-                });
+            // account balance, assuming "ownerAddress" contains an account balance
+            describe('when the sender has enough of a balance', function() {
+
             });
         });
+        // invalid address 
         describe('when the spender is the zero address', function () {
             const spender = ZERO_ADDRESS;
             const amount = 10;
