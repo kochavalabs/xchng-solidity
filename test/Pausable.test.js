@@ -34,9 +34,15 @@ contract('Pausable', async ([owner, other]) => {
         });
 
         it('should emit Pause event', async function () {
+<<<<<<< HEAD
             const { logs } =  await this.pausable.pause();
             assert.equal(logs.length, 1);
             assert.equal(logs[0].event, 'Pause');
+=======
+            await this.pausable.pause();
+            
+            // TODO: 
+>>>>>>> test(Pausable): added test file for Pausable contract
         });
     });
 
