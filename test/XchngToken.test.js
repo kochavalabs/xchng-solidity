@@ -2,15 +2,11 @@ import assertRevert from "./helpers/assertRevert.js"
 const XchngToken = artifacts.require("XchngToken");
 
 //Xchng Token contract ...takes a list of accounts ( supply from truffle test env)
-contract('XchngToken', async (accounts) => {
+contract('XchngToken', async ([ownerAddress,recipient,anotherAccount]) => {
     // zero address for sending transactions to
     const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
     // 5Billion * 10^18 Xti tokens as iniaitial supply
     const PREALLOCATED_SUPPLY = 5000000000000000000000000000;
-    // Set of user accounts to send tokens to / from 
-    const ownerAddress = accounts[0];
-    const recipient = accounts[1];
-    const anotherAccount = accounts[2];
 
     // Reinitialize XchngToken before each test ( Runs befor each test )
     beforeEach(async function (){
@@ -95,8 +91,9 @@ contract('XchngToken', async (accounts) => {
         describe('when the spender is not the zero address', function () {
             const spender = recipient;
             const amount  = 10;
-            // no account balance, assuming "anotherAccount" has not account balance
+            // no account balance, assuming "anotherAccount" has no account balance
             describe('when the sender does not have enough of a balance', function() {
+                // parse the emit event sent from the approve call
                 it('emits an approval event', async function() {
                     const { logs } = await this.token.approve(spender, amount, {from: anotherAccount});
                     assert.equal(logs.length, 1);
@@ -106,6 +103,7 @@ contract('XchngToken', async (accounts) => {
                     assert(logs[0].args._value.eq(amount));
                 });
                 describe('when there was no approved amount before', function() {
+                    // approve the requested amount and see if the allowance is set
                     it('approves the requested amount', async function() {
                         await this.token.approve(spender,amount, { from: anotherAccount }); 
                         const allowance = await this.token.allowance(anotherAccount,spender);
@@ -113,6 +111,7 @@ contract('XchngToken', async (accounts) => {
                     });
                 });
                 describe('when the spender had an approved amount', function() {
+                    // approve the requested amount and replace any previously set amount 
                     it('approves the requested amount and replaces the previous one', async function() {
                         // set the first approved amount to 1
                         await this.token.approve(spender,1, {from: anotherAccount});
@@ -128,7 +127,37 @@ contract('XchngToken', async (accounts) => {
             });
             // account balance, assuming "ownerAddress" contains an account balance
             describe('when the sender has enough of a balance', function() {
-
+                // parse the emit event sent from the approve call
+                it('emits an approval event', async function() {
+                    const { logs } = await this.token.approve(spender, amount, {from: anotherAccount});
+                    assert.equal(logs.length, 1);
+                    assert.equal(logs[0].event, 'Approval');
+                    assert.equal(logs[0].args._tokenOwner, anotherAccount);
+                    assert.equal(logs[0].args._spender,spender);
+                    assert(logs[0].args._value.eq(amount));
+                });
+                describe('when there was no approved amount before', function() {
+                    // approve the requested amount and see if the allowance is set
+                    it('approves the requested amount', async function() {
+                        await this.token.approve(spender,amount, { from: anotherAccount }); 
+                        const allowance = await this.token.allowance(anotherAccount,spender);
+                        assert.equal(allowance, amount);
+                    });
+                });
+                describe('when the spender had an approved amount', function() {
+                    // approve the requested amount and replace any previously set amount 
+                    it('approves the requested amount and replaces the previous one', async function() {
+                        // set the first approved amount to 1
+                        await this.token.approve(spender,1, {from: ownerAddress});
+                        // check to make sure the first approval is set
+                        const allowance1 = await this.token.allowance(ownerAddress, spender);
+                        assert.equal(allowance1,1);
+                        // then replace the approve with a new value 
+                        await this.token.approve(spender,amount,{from: ownerAddress});
+                        const allowance2 = await this.token.allowance(ownerAddress, spender);
+                        assert.equal(allowance2,amount);
+                    });
+                });
             });
         });
         // invalid address 
