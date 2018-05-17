@@ -34,9 +34,9 @@ contract('Pausable', async ([owner, other]) => {
         });
 
         it('should emit Pause event', async function () {
-            await this.pausable.pause();
-            
-            // TODO: 
+            const { logs } =  await this.pausable.pause();
+            assert.equal(logs.length, 1);
+            assert.equal(logs[0].event, 'Pause');
         });
     });
 
@@ -61,9 +61,9 @@ contract('Pausable', async ([owner, other]) => {
         });
 
         it('should emit Unpause event', async function () {
-            await this.pausable.unpause();
-            
-            // TODO: 
+            const { logs } = await this.pausable.unpause();
+            assert.equal(logs.length, 1);
+            assert.equal(logs[0].event, 'Unpause');
         });
     });
 });
