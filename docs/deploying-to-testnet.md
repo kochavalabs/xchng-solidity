@@ -24,7 +24,7 @@ Then, unlock that geth account:
 ```
 geth attach /home/ropsten/.ethereum/testnet/geth.ipc
 personal.unlockAccount(eth.accounts[0])
-``
+```
 
 ## Configuring Truffle
 
