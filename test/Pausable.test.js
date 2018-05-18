@@ -61,15 +61,9 @@ contract('Pausable', async ([owner, other]) => {
         });
 
         it('should emit Unpause event', async function () {
-<<<<<<< HEAD
             const { logs } = await this.pausable.unpause();
             assert.equal(logs.length, 1);
             assert.equal(logs[0].event, 'Unpause');
-=======
-            await this.pausable.unpause();
-            
-            // TODO: 
->>>>>>> test(Pausable): added test file for Pausable contract
         });
     });
 });
