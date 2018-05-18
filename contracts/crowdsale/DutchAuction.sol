@@ -100,10 +100,16 @@ contract DutchAuction is Ownable, Pausable, Whitelist {
     /// @param _price_exponent Auction price divisor exponent.
     constructor(address _wallet_address, uint _price_start, uint _price_constant, uint32 _price_exponent) public {
         require(_wallet_address != 0x0);
+        require(_price_start > 0);
+        require(_price_constant > 0);
+        require(_price_exponent > 0);
+
         wallet_address = _wallet_address;
+        price_start = _price_start;
+        price_constant = _price_constant;
+        price_exponent = _price_exponent;
 
         stage = Stages.AuctionDeployed;
-        changeSettings(_price_start, _price_constant, _price_exponent);
         emit Deployed(_price_start, _price_constant, _price_exponent);
     }
 
@@ -132,23 +138,6 @@ contract DutchAuction is Ownable, Pausable, Whitelist {
 
         stage = Stages.Setup;
         emit Setup();
-    }
-
-    /// @notice Set `_price_start`, `_price_constant` and `_price_exponent` as
-    /// the new starting price, price divisor constant and price divisor exponent.
-    /// @dev Changes auction price function parameters before auction is started.
-    /// @param _price_start Updated start price.
-    /// @param _price_constant Updated price divisor constant.
-    /// @param _price_exponent Updated price divisor exponent.
-    function changeSettings(uint _price_start, uint _price_constant, uint32 _price_exponent) internal {
-        require(stage == Stages.AuctionDeployed || stage == Stages.Setup);
-        require(_price_start > 0);
-        require(_price_constant > 0);
-        require(_price_exponent > 0);
-
-        price_start = _price_start;
-        price_constant = _price_constant;
-        price_exponent = _price_exponent;
     }
 
     /// @notice Start the auction.
