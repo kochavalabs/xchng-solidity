@@ -56,10 +56,49 @@ module.exports = {
 };
 ```
 
-## Deploying to the Live Network
+## Deploying to the Ropsten Network
 
 Run the following command to deploy:
 
 ```
 truffle migrate --network ropsten
+```
+
+Output should look like:
+
+```
+using network 'ropsten'.
+
+Running migration: 1_initial_migration.js
+  Deploying Migrations...
+  ... 0xe5bb9bc190c22957b2833ed85f13d29aba71b2df695af5eb9527f8e21e5f3e19
+  Migrations: 0x42e59ca6deeeb78dd25dd2ca86848fa821f5d8a6
+Saving successful migration to network...
+  ... 0x611f1aa2fe437a3257943f0bf607a7de0e1cff4a93ba8339c26bdb528bc63883
+Saving artifacts...
+Running migration: 2_deploy_contract.js
+  Deploying XchngToken...
+  ... 0xe0d49d5bb4b1cb6c744f844f819b97f12db8b4c9f170ceec786684f766a32d35
+  XchngToken: 0x9e95e55decc28643126255855196dd85a53adcf3
+Saving artifacts...
+```
+
+## When going to Live Mainnet
+
+Add the following network to the truffle.js file:
+
+```
+"live": {
+  provider: function () {
+    return new HDWalletProvider(mnemonic, node)
+  },
+  network_id: 1, // live Ethereum network
+  gas: 4700000
+}
+```
+
+Run the migrate command with live network specified:
+
+```
+truffle migrate --network live
 ```
