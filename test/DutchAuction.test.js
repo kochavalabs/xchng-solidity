@@ -241,7 +241,7 @@ contract('DutchAuction', async (accounts) => {
             // Check wallet eth balance before bids
             let balanceBeforeBids = await web3.eth.getBalance(accounts[0]);
 
-            // Place 4 MIN_INVESTMENT Bids
+            // Place 4 MIN_BID Bids
             await this.auction.bid({value: MIN_BID, from: accounts[1]}).should.be.fulfilled;
             await this.auction.bid({value: MIN_BID, from: accounts[2]}).should.be.fulfilled;
             await this.auction.bid({value: MIN_BID, from: accounts[3]}).should.be.fulfilled;
