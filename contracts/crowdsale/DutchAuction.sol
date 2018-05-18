@@ -15,7 +15,7 @@ contract DutchAuction is Ownable, Pausable, Whitelist {
      *  Constants
      */
     // Minimum amount of Ether that can be sent in a bid
-    uint constant public MIN_INVESTMENT = 1 ether;
+    uint constant public MIN_BID = 1 ether;
 
     // Wait 7 days after end of auction before anyone can claim tokens
     uint constant public WAITING_PERIOD = 7 days;
@@ -170,7 +170,7 @@ contract DutchAuction is Ownable, Pausable, Whitelist {
     function finalizeAuction() public onlyOwner whenNotPaused atStage(Stages.AuctionStarted) {
         // Missing funds should be 0 at this point
         uint missing_funds = missingFundsToEndAuction();
-        require(missing_funds < MIN_INVESTMENT);
+        require(missing_funds < MIN_BID);
 
         // Calculate the final price = WEI / XCHNG = WEI / ( XEI / token_multiplier)
         // Reminder: MAX_TOKENS_SOLD is the number of XEI (XCHNG * token_multiplier) that are auctioned
@@ -189,7 +189,7 @@ contract DutchAuction is Ownable, Pausable, Whitelist {
     /// @notice Send `msg.value` WEI to the auction from the `msg.sender` account.
     /// @dev Allows to send a bid to the auction.
     function bid() public payable isWhitelisted whenNotPaused atStage(Stages.AuctionStarted) {
-        require(msg.value >= MIN_INVESTMENT); // Bid must be greater than or equal to the minimum investment
+        require(msg.value >= MIN_BID); // Bid must be greater than or equal to the minimum bid
 
         // Missing funds without the current bid value
         uint missing_funds = missingFundsToEndAuction();
