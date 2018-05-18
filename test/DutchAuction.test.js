@@ -245,6 +245,8 @@ contract('DutchAuction', async (accounts) => {
     describe('bid()', function () {
         // Setup and start auction  with whitelisted accounts for testing
         beforeEach(async function () {
+            // Overwrite the approval before setup to only auction 40 tokens (80 ETH at price Start)
+            await this.token.approve(this.auction.address, 40000000000000000000, { from: accounts[0] });
             // Params are the token address, token wallet (accounts[0]) and exchange rate
             await this.auction.setup(this.token.address, accounts[0]);
 
@@ -293,7 +295,7 @@ contract('DutchAuction', async (accounts) => {
         it('should reject bids greater than funds missing to end the auction', async function () {
             // Bid 1 Wei greater than funds required to end auction
             let missingFunds = await this.auction.missingFundsToEndAuction();
-            await this.auction.bid({value: missingFunds.toNumber() + 1, from: accounts[1] }).should.be.rejected;
+            await this.auction.bid({value: missingFunds.add(1), from: accounts[1] }).should.be.rejected;
         });
 
         it('should put the submitted ETH into the auction wallet address', async function () {
