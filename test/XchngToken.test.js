@@ -277,4 +277,8 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount]) => {
     describe('transferFrom()', function() {
 
     });
+    // Test tranfers from one account to another 
+    describe('transferFrom()', function() {
+
+    });
 });
