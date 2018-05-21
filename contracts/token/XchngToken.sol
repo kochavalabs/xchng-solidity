@@ -78,8 +78,6 @@ contract XchngToken is Ownable, StandardToken, Pausable {
         // Don't need to require num <= totalSupply since sender's balance 
         // must be less than or equal to total supply
 
-        uint pre_balance = balances[msg.sender];
-
         balances[msg.sender] = balances[msg.sender].sub(_num);
         totalSupply = totalSupply.sub(_num);
         emit Burnt(msg.sender, _num, totalSupply);
