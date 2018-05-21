@@ -10,8 +10,8 @@ contract XchngToken is Ownable, StandardToken, Pausable {
     using SafeMath for uint;
     /*
      *  Terminology:
-     *  1 token unit = XEI
-     *  1 token = XCHNG = XEI * multiplier
+     *  1 token unit = Xei
+     *  1 token = XCHNG = Xei * multiplier
      *  multiplier set from token's number of decimals (i.e. 10 ** decimals)
      */
 
@@ -35,7 +35,7 @@ contract XchngToken is Ownable, StandardToken, Pausable {
     /// @dev Contract constructor function sets dutch auction contract address
     /// and assigns all tokens to dutch auction.
     /// @param _owner_address Address of owners wallet.
-    /// @param _preallocated Number of initially provided token units for preallocation (XEI).
+    /// @param _preallocated Number of initially provided token units for preallocation (Xei).
     constructor(address _owner_address, uint _preallocated) public {
         require(_owner_address != 0x0);
 
@@ -68,10 +68,10 @@ contract XchngToken is Ownable, StandardToken, Pausable {
         return super.approve(_spender, _value);
     }
 
-    /// @notice Allows `msg.sender` to simply destroy `num` token units (Rei). This means the total
+    /// @notice Allows `msg.sender` to simply destroy `num` token units (Xei). This means the total
     /// token supply will decrease.
-    /// @dev Allows to destroy token units (Rei).
-    /// @param _num Number of token units (Rei) to burn.
+    /// @dev Allows to destroy token units (Xei).
+    /// @param _num Number of token units (Xei) to burn.
     function burn(uint _num) public whenNotPaused {
         require(_num > 0);
         require(balances[msg.sender] >= _num);
