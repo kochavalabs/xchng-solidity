@@ -221,6 +221,20 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount]) => {
         describe('when the spender is the zero address', function () {
             const spender = ZERO_ADDRESS;
             const amount = 10;
+            it('approves the requested amount and emits an approval event', async function() {
+                const { logs } = await this.token.approve(spender, amount, { from: ownerAddress });
+                assert.equal(logs.length, 1);
+                assert.equal(logs[0].event, 'Approval');
+                assert.equal(logs[0].args._tokenOwner, ownerAddress);
+                assert.equal(logs[0].args._spender,spender);
+                assert(logs[0].args._value.eq(amount)); 
+                const allowance = await this.token.allowance(ownerAddress, spender);
+                assert.equal(allowance, amount);
+            });
         });
+    });
+    // Test tranfers from one account to another 
+    describe('transferFrom()', function() {
+
     });
 });
