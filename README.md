@@ -8,13 +8,13 @@ Future contracts can be added to take advantage of existing implementations and 
 
 [Truffle](http://truffleframework.com/docs/) is a development environment, testing framework and asset pipeline for Ethereum. 
 
-A `truffle.js` and `truffle-config.js` will be created. You can set additional configurations for your truffle enviroment their. 
+A `truffle.js` and `truffle-config.js` will be created. You can set additional configurations for your truffle enviroment there. 
 
 ## Install Ganache 
 
-[Ganache](http://truffleframework.com/ganache/) is a private blockchain for ethereum development. It allows you to easily deploy,tests, and debug contracts and applications. 
+[Ganache](http://truffleframework.com/ganache/) is a private blockchain for ethereum development. It allows you to easily deploy,tests, and debug contracts/applications. 
 
-Install ganache by downloading appropriate version for your OS 
+Install ganache by downloading the appropriate version for your OS 
 
 or 
 
@@ -22,7 +22,7 @@ Install the ganache-cli through npm using `npm install -g ganache-cli`
 
 ## Setting up truffle with Metamask
 
-Metamask is a easy to use browser extension. You can set up a private network by following [this setup guide](http://truffleframework.com/docs/advanced/truffle-with-metamask)
+Metamask is an easy to use browser extension. You can set up a private network by following [this setup guide](http://truffleframework.com/docs/advanced/truffle-with-metamask)
 
 ## Install dependencies
 
@@ -36,11 +36,11 @@ To compile the solidity contracts run `truffle compile` from the project root di
 
 The compiled artifacts will be placed under `prject_root_dir/build/contracts/`
 
-**Note** Truffle expects contracts to be located at `project_root_dir/contracts`
+**Note** : Truffle expects contracts to be located at `project_root_dir/contracts`
 
 ## Migrating contracts with Truffle 
 
-To deploy/migrate contracts to a local ganache instances run `truffle migrate --network ganache` from the project root dir. 
+To deploy/migrate contracts to a local ganache instance run `truffle migrate --network ganache` from the project root dir. 
 
 ## Running test with Truffle 
 
@@ -50,7 +50,7 @@ To test our smart contracts run `truffle test` from the project root dir.
 
 To execute a single test file run : `truffle test ./path/to/test/file.js`
 
-**Note** Truffle expects contract tests to be located at `project_root_dir/test`
+**Note** : Truffle expects contract tests to be located at `project_root_dir/test`
 
 ## Solidity coverage report 
 
