@@ -71,6 +71,35 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount]) => {
             assert.equal(logs[1].args._value, burnAmount.toNumber()); 
         });
     });
+
+    // --------------
+    //  ERC-223 tests 
+    // --------------
+    // Test ERC223 transfer with Data
+    // Note: This is using a workaround call to test the overloaded transfer function
+    // Cannot test reverts or check logs for events until Truffle fully supports overloaded functions.
+    describe('ERC223 transfer()', function() {
+        // valid address
+        describe('when the recipient is the not the zero address', function(){
+            const to = recipient;
+            const amount = 10;
+            // Assume that the owner has the PREALLOCATED_SUPPLY
+            describe('when the sender does have enough of a balance', function() {
+                const to = recipient;
+                const amount = 10; 
+                it('transfers the requested amount from the sender to the recipient', async function() {
+                    await this.token.contract.transfer['address,uint256,bytes'](to, amount, '', { from: ownerAddress });
+
+                    // check that the owner now has the updated balance 
+                    const ownerBalance = await this.token.balanceOf(ownerAddress);
+                    assert.equal(ownerBalance,(PREALLOCATED_SUPPLY-amount));
+                    // check that the recipient now has the amount transfered
+                    const recipientBalance = await this.token.balanceOf(to);
+                    assert.equal(recipientBalance, amount);
+                });
+            });
+        });
+    });
     
     // --------------
     //  ERC-20 tests 
