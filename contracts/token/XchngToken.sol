@@ -68,14 +68,15 @@ contract XchngToken is Ownable, StandardToken, Pausable {
         return super.approve(_spender, _value);
     }
 
-    /// @notice Allows `msg.sender` to simply destroy `num` token units (Rei). This means the total
+    /// @notice Allows `msg.sender` to simply destroy `num` token units (XEI). This means the total
     /// token supply will decrease.
-    /// @dev Allows to destroy token units (Rei).
-    /// @param _num Number of token units (Rei) to burn.
+    /// @dev Allows to destroy token units (XEI).
+    /// @param _num Number of token units (XEI) to burn.
     function burn(uint _num) public whenNotPaused {
         require(_num > 0);
         require(balances[msg.sender] >= _num);
-        require(totalSupply >= _num);
+        // Don't need to require num <= totalSupply since sender's balance 
+        // must be less than or equal to total supply
 
         uint pre_balance = balances[msg.sender];
 
