@@ -84,7 +84,5 @@ contract XchngToken is Ownable, StandardToken, Pausable {
         totalSupply = totalSupply.sub(_num);
         emit Burnt(msg.sender, _num, totalSupply);
         emit Transfer(msg.sender, 0x0, _num);
-
-        assert(balances[msg.sender] == pre_balance.sub(_num));
     }
 }
