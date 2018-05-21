@@ -62,7 +62,6 @@ contract StandardToken is ERC20Interface, ERC223Interface {
         require(_to != 0x0); 
         require(_to != address(this));
         require(balances[msg.sender] >= _value);
-        require(balances[_to] + _value >= balances[_to]);
         
         uint codeLength;
         bytes memory empty;
@@ -101,7 +100,6 @@ contract StandardToken is ERC20Interface, ERC223Interface {
         require(_to != 0x0); 
         require(_to != address(this));
         require(balances[msg.sender] >= _value);
-        require(balances[_to] + _value >= balances[_to]);
 
         uint codeLength;
         
@@ -141,7 +139,6 @@ contract StandardToken is ERC20Interface, ERC223Interface {
         require(_to != address(this));
         require(balances[_from] >= _value); 
         require(allowed[_from][msg.sender] >= _value);
-        require(balances[_to] + _value >= balances[_to]);
 
         balances[_to] = balances[_to].add(_value);
         balances[_from] = balances[_from].sub(_value);
