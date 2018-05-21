@@ -17,7 +17,7 @@ contract('ERC223Token', async (accounts) => {
     describe('transfer()', function () {
         // Transfer to the contract address will call the token fallback
         it('should call token fallback and update mock state', async function () {
-            const amount = 10;
+            let amount = 10;
             const to = this.tokenFallbackMock.address;
 
             // Transfer without data
@@ -30,10 +30,15 @@ contract('ERC223Token', async (accounts) => {
             let from = await this.tokenFallbackMock.from();
             assert.equal(ownerAddress, from);
 
-            // Transfer with data
-            // Note: Truffle test does not currently work with overloaded function names: 
-            // https://github.com/trufflesuite/truffle/issues/569
-            // this.token.transfer(this.tokenFallbackMock.address, 10, '');
+            // Change amount for second test
+            amount = 100;
+
+            // Workaround for overloaded function until Truffle adds support.
+            // Must call contract with the function definition including parameters AND the from address included
+            this.token.contract.transfer['address,uint256,bytes'](to, amount, '', { from: ownerAddress });
+            // Check that the amount was updated
+            value = await this.tokenFallbackMock.value();
+            assert.equal(value, amount);
         });
     });
 });
