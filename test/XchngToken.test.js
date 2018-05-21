@@ -269,4 +269,8 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount]) => {
 
 >>>>>>> test(token) : added approve when address in zero address
     });
+    // Test tranfers from one account to another 
+    describe('transferFrom()', function() {
+
+    });
 });
