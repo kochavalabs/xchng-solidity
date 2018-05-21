@@ -14,6 +14,63 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount]) => {
         // account 0 ( owner for testing )
         this.token = await XchngToken.new(ownerAddress,PREALLOCATED_SUPPLY);
     });
+
+    // --------------
+    //  XchngToken tests 
+    // --------------
+    describe('burn()', function () {
+        it('should revert if submitted with value 0', async function () {
+            await assertRevert(this.token.burn(0));
+        });
+
+        it('should revert if value is greater than senders balance', async function () {
+            let num = new web3.BigNumber(PREALLOCATED_SUPPLY);
+
+            // Try to burn more than the supply
+            await assertRevert(this.token.burn(num.add(1)));
+        });
+
+        it('should update the balance of sender', async function () {
+            let num = new web3.BigNumber(PREALLOCATED_SUPPLY);
+            let burnAmount = new web3.BigNumber(1000000000000000000); // Burn 1 XCHNG
+
+            // Before burn
+            let result = await this.token.totalSupply();
+            assert.equal(num.toNumber(), result.toNumber());
+
+            await this.token.burn(burnAmount);
+
+            // After burn
+            result = await this.token.totalSupply();
+            assert.equal(num.sub(burnAmount).toNumber(), result.toNumber());
+        });
+
+        it('should update the totalSupply', async function () {
+            let num = new web3.BigNumber(PREALLOCATED_SUPPLY);
+            let burnAmount = new web3.BigNumber(1000000000000000000); // Burn 1 XCHNG
+
+            await this.token.burn(burnAmount);
+            // Owner should now have 1 less token
+            let result = await this.token.balanceOf(ownerAddress);
+            assert.equal(num.sub(burnAmount).toNumber(), result.toNumber());
+        });
+
+        it('should emit events', async function () {
+            let num = new web3.BigNumber(PREALLOCATED_SUPPLY);
+            let burnAmount = new web3.BigNumber(1000000000000000000); // Burn 1 XCHNG
+
+            const { logs } = await this.token.burn(burnAmount);
+            assert.equal(logs.length, 2);
+            assert.equal(logs[0].event, 'Burnt');
+            assert.equal(logs[0].args._receiver, ownerAddress);
+            assert.equal(logs[0].args._num, burnAmount.toNumber());
+            assert.equal(logs[0].args._total_supply, num.sub(burnAmount).toNumber());
+            assert.equal(logs[1].event, 'Transfer');
+            assert.equal(logs[1].args._from, ownerAddress);
+            assert.equal(logs[1].args._to, ZERO_ADDRESS);
+            assert.equal(logs[1].args._value, burnAmount.toNumber()); 
+        });
+    });
     
     // --------------
     //  ERC-20 tests 
@@ -165,6 +222,5 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount]) => {
             const spender = ZERO_ADDRESS;
             const amount = 10;
         });
-
     });
 });
