@@ -278,17 +278,15 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount,approver]) 
     describe('transferFrom()', function() {
         const spender = recipient;
         beforeEach(async function () {
-            // Give the approver a balance of 100
+            // Give the approver a balance of 100 and approve spender for 100 before each test
             await this.token.transfer(approver, 100, { from: ownerAddress });
+            await this.token.approve(spender, 100, { from: approver });
         });
 
         describe('when the recipient is not the zero address', function () {
             const to = anotherAccount;
 
             describe('when the spender has enough approved balance', function () {
-                beforeEach(async function () {
-                    await this.token.approve(spender, 100, { from: approver });
-                });
 
                 describe('when the approver has enough balance', function () {
                     const amount = 100;
@@ -338,14 +336,14 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount,approver]) 
             });
 
             describe('when the spender does not have enough approved balance', function () {
-                beforeEach(async function () {
-                    await this.token.approve(spender, 99, { from: approver });
-                });
 
                 describe('when the approver has enough balance', function () {
                     const amount = 100;
 
                     it('reverts', async function () {
+                        // Override the spenders approved amount
+                        await this.token.approve(spender, 99, { from: approver });
+
                         await assertRevert(this.token.transferFrom(approver, to, amount, { from: spender }));
                     });
                 });
@@ -364,10 +362,6 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount,approver]) 
             const amount = 100;
             const to = ZERO_ADDRESS;
 
-            beforeEach(async function () {
-                await this.token.approve(spender, amount, { from: approver });
-            });
-
             it('reverts', async function () {
                 await assertRevert(this.token.transferFrom(approver, to, amount, { from: spender }));
             });
@@ -375,10 +369,6 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount,approver]) 
 
         describe('when the recipient is the Xchng contract address', function () {
             const amount = 100;
-
-            beforeEach(async function () {
-                await this.token.approve(spender, amount, { from: approver });
-            });
 
             it('reverts', async function () {
                 await assertRevert(this.token.transferFrom(approver, this.token.address, amount, { from: spender }));
