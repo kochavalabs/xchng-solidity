@@ -290,7 +290,7 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount,approver]) 
                     await this.token.approve(spender, 100, { from: approver });
                 });
 
-                describe('when the owner has enough balance', function () {
+                describe('when the approver has enough balance', function () {
                     const amount = 100;
 
                     it('transfers the requested amount', async function () {
@@ -321,11 +321,18 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount,approver]) 
                     });
                 });
 
-                describe('when the owner does not have enough balance', function () {
+                describe('when the approver does not have enough balance', function () {
                     const amount = 101;
 
                     it('reverts', async function () {
                         await assertRevert(this.token.transferFrom(approver, to, amount, { from: spender }));
+                    });
+                });
+
+                describe('when the approver is the zero address', function () {
+                    const amount = 100;
+                    it('reverts', async function () {
+                        await assertRevert(this.token.transferFrom(ZERO_ADDRESS, to, amount, { from: spender }));
                     });
                 });
             });
@@ -335,7 +342,7 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount,approver]) 
                     await this.token.approve(spender, 99, { from: approver });
                 });
 
-                describe('when the owner has enough balance', function () {
+                describe('when the approver has enough balance', function () {
                     const amount = 100;
 
                     it('reverts', async function () {
@@ -343,7 +350,7 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount,approver]) 
                     });
                 });
 
-                describe('when the owner does not have enough balance', function () {
+                describe('when the approver does not have enough balance', function () {
                     const amount = 101;
 
                     it('reverts', async function () {
@@ -363,6 +370,18 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount,approver]) 
 
             it('reverts', async function () {
                 await assertRevert(this.token.transferFrom(approver, to, amount, { from: spender }));
+            });
+        });
+
+        describe('when the recipient is the Xchng contract address', function () {
+            const amount = 100;
+
+            beforeEach(async function () {
+                await this.token.approve(spender, amount, { from: approver });
+            });
+
+            it('reverts', async function () {
+                await assertRevert(this.token.transferFrom(approver, this.token.address, amount, { from: spender }));
             });
         });
     });
