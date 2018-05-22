@@ -2,7 +2,7 @@ import assertRevert from "./helpers/assertRevert.js"
 const XchngToken = artifacts.require("XchngToken");
 
 //Xchng Token contract ...takes a list of accounts ( supply from truffle test env)
-contract('XchngToken', async ([ownerAddress,recipient,anotherAccount]) => {
+contract('XchngToken', async ([ownerAddress,recipient,anotherAccount,approver]) => {
     // zero address for sending transactions to
     const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
     // 5Billion * 10^18 Xti tokens as iniaitial supply
@@ -18,6 +18,13 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount]) => {
     // --------------
     //  XchngToken tests 
     // --------------
+    describe('constructor()', function () {
+        it('should require a valid owner address', async function () {
+            // Revert if zero address is provided as owner
+            await assertRevert(XchngToken.new(ZERO_ADDRESS, PREALLOCATED_SUPPLY));
+        });
+    });
+
     describe('burn()', function () {
         it('should revert if submitted with value 0', async function () {
             await assertRevert(this.token.burn(0));
@@ -133,6 +140,11 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount]) => {
         describe('when the recipient is the not the zero address', function(){
             const to = recipient;
             const amount = 10;
+            describe('when the recipient is the address of the Xchng contract', function() {
+                it('reverts', async function() {
+                    await assertRevert(this.token.transfer(this.token.address, amount, {from: ownerAddress}))
+                });
+            });
             describe('when the sender does not have enough of a balance', function() {
                 it('reverts', async function() {
                     await assertRevert(this.token.transfer(to, amount, {from: anotherAccount}))
@@ -264,6 +276,94 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount]) => {
     });
     // Test tranfers from one account to another 
     describe('transferFrom()', function() {
+        const spender = recipient;
+        beforeEach(async function () {
+            // Give the approver a balance of 100
+            await this.token.transfer(approver, 100, { from: ownerAddress });
+        });
 
+        describe('when the recipient is not the zero address', function () {
+            const to = anotherAccount;
+
+            describe('when the spender has enough approved balance', function () {
+                beforeEach(async function () {
+                    await this.token.approve(spender, 100, { from: approver });
+                });
+
+                describe('when the owner has enough balance', function () {
+                    const amount = 100;
+
+                    it('transfers the requested amount', async function () {
+                        await this.token.transferFrom(approver, to, amount, { from: spender });
+
+                        const senderBalance = await this.token.balanceOf(approver);
+                        assert.equal(senderBalance, 0);
+
+                        const recipientBalance = await this.token.balanceOf(to);
+                        assert.equal(recipientBalance, amount);
+                    });
+
+                    it('decreases the spender allowance', async function () {
+                        await this.token.transferFrom(approver, to, amount, { from: spender });
+
+                        const allowance = await this.token.allowance(approver, spender);
+                        assert.equal(allowance, 0);
+                    });
+
+                    it('emits a transfer event', async function () {
+                        const { logs } = await this.token.transferFrom(approver, to, amount, { from: spender });
+
+                        assert.equal(logs.length, 1);
+                        assert.equal(logs[0].event, 'Transfer');
+                        assert.equal(logs[0].args._from, approver);
+                        assert.equal(logs[0].args._to, to);
+                        assert.equal(logs[0].args._value, amount);
+                    });
+                });
+
+                describe('when the owner does not have enough balance', function () {
+                    const amount = 101;
+
+                    it('reverts', async function () {
+                        await assertRevert(this.token.transferFrom(approver, to, amount, { from: spender }));
+                    });
+                });
+            });
+
+            describe('when the spender does not have enough approved balance', function () {
+                beforeEach(async function () {
+                    await this.token.approve(spender, 99, { from: approver });
+                });
+
+                describe('when the owner has enough balance', function () {
+                    const amount = 100;
+
+                    it('reverts', async function () {
+                        await assertRevert(this.token.transferFrom(approver, to, amount, { from: spender }));
+                    });
+                });
+
+                describe('when the owner does not have enough balance', function () {
+                    const amount = 101;
+
+                    it('reverts', async function () {
+                        await assertRevert(this.token.transferFrom(approver, to, amount, { from: spender }));
+                    });
+                });
+            });
+        });
+
+        describe('when the recipient is the zero address', function () {
+            const amount = 100;
+            const to = ZERO_ADDRESS;
+
+            beforeEach(async function () {
+                await this.token.approve(spender, amount, { from: approver });
+            });
+
+            it('reverts', async function () {
+                await assertRevert(this.token.transferFrom(approver, to, amount, { from: spender }));
+            });
+        });
     });
 });
