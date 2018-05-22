@@ -144,7 +144,7 @@ contract StandardToken is ERC20Interface, ERC223Interface {
         balances[_from] = balances[_from].sub(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
 
-        emit Transfer(msg.sender, _to, _value);
+        emit Transfer(_from, _to, _value);
 
         return true;
     }
