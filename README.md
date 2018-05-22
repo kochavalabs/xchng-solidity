@@ -8,7 +8,7 @@ Future contracts can be added to take advantage of existing implementations and 
 
 [Truffle](http://truffleframework.com/docs/) is a development environment, testing framework and asset pipeline for Ethereum. 
 
-A `truffle.js` and `truffle-config.js` will be created. You can set additional configurations for your truffle enviroment there. 
+A `truffle.js` and `truffle-config.js` will be created. You can set additional configurations for your truffle environment there. 
 
 ## Install Ganache 
 
@@ -108,7 +108,7 @@ The setup script will initialize the Xchng Token, authorize the Auction to trans
 node scripts/setup.js
 ```
 
-#### Confiuration
+#### Configuration
 
 | ENV | Default | Description |
 |-----|---------|-------------|
@@ -125,12 +125,12 @@ The bid script will submit a bid to the auction. By default it bids 1 ETH, and c
 node scripts/bid.js
 ```
 
-#### Confiuration
+#### Configuration
 
 | ENV | Default | Description |
 |-----|---------|-------------|
 | WEB3_URL | http://localhost:7545 | By default set to local ganache |
-| AUCTION_ADDRESS | none | The address of the auction |
+| CONTRACT_ADDRESS | none | The address of the auction |
 | TOKEN_ADDRESS | none | The address of the token |
 | FROM_ADDRESS | None | The address to bid from, by default this is 'None' which causes the script to randomly choose one of the ganache addresses to bid from |
 | BID_AMOUNT | '1' | The amount of ETH to bid, this needs to be _at least_ 1 ETH |
