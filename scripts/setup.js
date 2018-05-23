@@ -1,8 +1,8 @@
 /* eslint no-unused-vars: "off", prefer-const: "off" */
 const { awaitHandler, STAGES } = require('./util');
 const {
-  web3, dutchAuction, xchngToken, AUCTION_ADDRESS, TOKEN_ADDRESS, NUM_TOKENS_AVAILABLE, getAccounts, getStage,
-} = require('./web3');
+  dutchAuction, xchngToken, AUCTION_ADDRESS, TOKEN_ADDRESS, NUM_TOKENS_AVAILABLE, getAccounts, getStage,
+} = require('./hdwallet');
 
 async function setup() {
   let err;
