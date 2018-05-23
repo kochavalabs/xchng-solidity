@@ -86,25 +86,17 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount,approver]) 
     // Note: This is using a workaround call to test the overloaded transfer function
     // Cannot test reverts or check logs for events until Truffle fully supports overloaded functions.
     describe('ERC223 transfer()', function() {
-        // valid address
-        describe('when the recipient is the not the zero address', function(){
-            const to = recipient;
-            const amount = 10;
-            // Assume that the owner has the PREALLOCATED_SUPPLY
-            describe('when the sender does have enough of a balance', function() {
-                const to = recipient;
-                const amount = 10; 
-                it('transfers the requested amount from the sender to the recipient', async function() {
-                    await this.token.contract.transfer['address,uint256,bytes'](to, amount, '', { from: ownerAddress });
+        const to = recipient;
+        const amount = 10;
+        it('should transfer the requested amount to the recipient if the recipient is not the zero address', async function() {
+            await this.token.contract.transfer['address,uint256,bytes'](to, amount, '', { from: ownerAddress });
 
-                    // check that the owner now has the updated balance 
-                    const ownerBalance = await this.token.balanceOf(ownerAddress);
-                    assert.equal(ownerBalance,(PREALLOCATED_SUPPLY-amount));
-                    // check that the recipient now has the amount transfered
-                    const recipientBalance = await this.token.balanceOf(to);
-                    assert.equal(recipientBalance, amount);
-                });
-            });
+            // check that the owner now has the updated balance 
+            const ownerBalance = await this.token.balanceOf(ownerAddress);
+            assert.equal(ownerBalance,(PREALLOCATED_SUPPLY-amount));
+            // check that the recipient now has the amount transfered
+            const recipientBalance = await this.token.balanceOf(to);
+            assert.equal(recipientBalance, amount);
         });
     });
     
@@ -113,25 +105,21 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount,approver]) 
     // --------------
     // Test the total supply function by callying totalSupply on the token contract and expecting the preallocated amount
     describe('totalSupply()', function () {
-        it('returns the total amount of tokens', async function() {
+        it('should return the total amount of tokens', async function() {
             const totalSupply = await this.token.totalSupply();
             assert.equal(totalSupply, PREALLOCATED_SUPPLY);
         });
     });
     // Test balance of an account 
     describe('balanceOf()', function() {
-        describe('when the requested account has no tokens ', function() {
-            it('returns zero', async function() {
-                const balance = await this.token.balanceOf(anotherAccount);
-                assert.equal(balance, 0);
-            });
+        it('should return zero if account has no balance', async function() {
+            const balance = await this.token.balanceOf(anotherAccount);
+            assert.equal(balance, 0);
         });
         // Assume that the owners account has all the tokens allocated to it
-        describe('when the requested account has tokens ', function() {
-            it('returns the balance of the account', async function() {
-                const balance = await this.token.balanceOf(ownerAddress);
-                assert.equal(balance,PREALLOCATED_SUPPLY);
-            });
+        it('should return the balance of the account if there is a balance', async function() {
+            const balance = await this.token.balanceOf(ownerAddress);
+            assert.equal(balance,PREALLOCATED_SUPPLY);
         });
     });
     // Test transfer from an account to anotherAccount
@@ -140,42 +128,33 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount,approver]) 
         describe('when the recipient is the not the zero address', function(){
             const to = recipient;
             const amount = 10;
-            describe('when the recipient is the address of the Xchng contract', function() {
-                it('reverts', async function() {
-                    await assertRevert(this.token.transfer(this.token.address, amount, {from: ownerAddress}))
-                });
+            it('should revert if recipient is the address of the Xchng contract', async function() {
+                await assertRevert(this.token.transfer(this.token.address, amount, {from: ownerAddress}))
             });
-            describe('when the sender does not have enough of a balance', function() {
-                it('reverts', async function() {
-                    await assertRevert(this.token.transfer(to, amount, {from: anotherAccount}))
-                });
+            it('should revert if the sender does not have enough of a balance', async function() {
+                await assertRevert(this.token.transfer(to, amount, {from: anotherAccount}))
             });
-            // Assume that the owner has the PREALLOCATED_SUPPLY
-            describe('when the sender does have enough of a balance', function() {
-                const to = recipient;
-                const amount = 10; 
-                it('transfers the requested amount from the sender to the recipient and emits a transfer event', async function() {
-                    const { logs } =  await this.token.transfer(to, amount, {from:ownerAddress});
-                    // check that we have an event from our transfer call
-                    assert.equal(logs.length, 1);
-                    assert.equal(logs[0].event, 'Transfer');
-                    assert.equal(logs[0].args._from, ownerAddress);
-                    assert.equal(logs[0].args._to, to);
-                    assert(logs[0].args._value.eq(amount)); 
-                    // check that the owner now has the updated balance 
-                    const ownerBalance = await this.token.balanceOf(ownerAddress);
-                    assert.equal(ownerBalance,(PREALLOCATED_SUPPLY-amount));
-                    // check that the recipient now has the amount transfered
-                    const recipientBalance = await this.token.balanceOf(to);
-                    assert.equal(recipientBalance, amount);
-                });
+            it('should transfer the requested amount to the recipient and emits a transfer event if the sender has enough of a balance', async function() {
+                const { logs } =  await this.token.transfer(to, amount, {from:ownerAddress});
+                // check that we have an event from our transfer call
+                assert.equal(logs.length, 1);
+                assert.equal(logs[0].event, 'Transfer');
+                assert.equal(logs[0].args._from, ownerAddress);
+                assert.equal(logs[0].args._to, to);
+                assert(logs[0].args._value.eq(amount)); 
+                // check that the owner now has the updated balance 
+                const ownerBalance = await this.token.balanceOf(ownerAddress);
+                assert.equal(ownerBalance,(PREALLOCATED_SUPPLY-amount));
+                // check that the recipient now has the amount transfered
+                const recipientBalance = await this.token.balanceOf(to);
+                assert.equal(recipientBalance, amount);
             });
         });
         // Zero address 
         describe('when the recipient is the zero address', function () {
             const to = ZERO_ADDRESS;
             const amount = 10;
-            it('reverts', async function() {
+            it('should revert', async function() {
                 await assertRevert(this.token.transfer(to, amount, {from: ownerAddress}));
                 // check that the owner did not lose the transfer tokens on on a revert
                 const ownerBalance = await this.token.balanceOf(ownerAddress);
@@ -192,41 +171,37 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount,approver]) 
             // no account balance, assuming "anotherAccount" has no account balance
             describe('when the sender does not have enough of a balance', function() {
                 // parse the emit event sent from the approve call
-                it('emits an approval event', async function() {
+                it('should emit an approval event', async function() {
                     const { logs } = await this.token.approve(spender, amount, {from: anotherAccount});
                     assert.equal(logs.length, 1);
                     assert.equal(logs[0].event, 'Approval');
                     assert.equal(logs[0].args._tokenOwner, anotherAccount);
                     assert.equal(logs[0].args._spender,spender);
                     assert(logs[0].args._value.eq(amount));
+                 });
+                // approve the requested amount and see if the allowance is set
+                it('should approve the requested amount if not approved amount exists', async function() {
+                    await this.token.approve(spender,amount, { from: anotherAccount }); 
+                    const allowance = await this.token.allowance(anotherAccount,spender);
+                    assert.equal(allowance, amount);
                 });
-                describe('when there was no approved amount before', function() {
-                    // approve the requested amount and see if the allowance is set
-                    it('approves the requested amount', async function() {
-                        await this.token.approve(spender,amount, { from: anotherAccount }); 
-                        const allowance = await this.token.allowance(anotherAccount,spender);
-                        assert.equal(allowance, amount);
-                    });
-                });
-                describe('when the spender had an approved amount', function() {
-                    // approve the requested amount and replace any previously set amount 
-                    it('approves the requested amount and replaces the previous one', async function() {
-                        // set the first approved amount to 1
-                        await this.token.approve(spender,1, {from: anotherAccount});
-                        // check to make sure the first approval is set
-                        const allowance1 = await this.token.allowance(anotherAccount, spender);
-                        assert.equal(allowance1,1);
-                        // then replace the approve with a new value 
-                        await this.token.approve(spender,amount,{from: anotherAccount});
-                        const allowance2 = await this.token.allowance(anotherAccount, spender);
-                        assert.equal(allowance2,amount);
-                    });
+                // approve the requested amount and replace any previously set amount 
+                it('should approve the requested amount and replaces the previous one if an approval exists', async function() {
+                    // set the first approved amount to 1
+                    await this.token.approve(spender,1, {from: anotherAccount});
+                    // check to make sure the first approval is set
+                    const allowance1 = await this.token.allowance(anotherAccount, spender);
+                    assert.equal(allowance1,1);
+                    // then replace the approve with a new value 
+                    await this.token.approve(spender,amount,{from: anotherAccount});
+                    const allowance2 = await this.token.allowance(anotherAccount, spender);
+                    assert.equal(allowance2,amount);
                 });
             });
             // account balance, assuming "ownerAddress" contains an account balance
             describe('when the sender has enough of a balance', function() {
                 // parse the emit event sent from the approve call
-                it('emits an approval event', async function() {
+                it('should emit an approval event', async function() {
                     const { logs } = await this.token.approve(spender, amount, {from: anotherAccount});
                     assert.equal(logs.length, 1);
                     assert.equal(logs[0].event, 'Approval');
@@ -234,27 +209,23 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount,approver]) 
                     assert.equal(logs[0].args._spender,spender);
                     assert(logs[0].args._value.eq(amount));
                 });
-                describe('when there was no approved amount before', function() {
-                    // approve the requested amount and see if the allowance is set
-                    it('approves the requested amount', async function() {
-                        await this.token.approve(spender,amount, { from: anotherAccount }); 
-                        const allowance = await this.token.allowance(anotherAccount,spender);
-                        assert.equal(allowance, amount);
-                    });
+                // approve the requested amount and see if the allowance is set
+                it('should approve the requested amount if not approved amount exists', async function() {
+                    await this.token.approve(spender,amount, { from: anotherAccount }); 
+                    const allowance = await this.token.allowance(anotherAccount,spender);
+                    assert.equal(allowance, amount);
                 });
-                describe('when the spender had an approved amount', function() {
-                    // approve the requested amount and replace any previously set amount 
-                    it('approves the requested amount and replaces the previous one', async function() {
-                        // set the first approved amount to 1
-                        await this.token.approve(spender,1, {from: ownerAddress});
-                        // check to make sure the first approval is set
-                        const allowance1 = await this.token.allowance(ownerAddress, spender);
-                        assert.equal(allowance1,1);
-                        // then replace the approve with a new value 
-                        await this.token.approve(spender,amount,{from: ownerAddress});
-                        const allowance2 = await this.token.allowance(ownerAddress, spender);
-                        assert.equal(allowance2,amount);
-                    });
+                // approve the requested amount and replace any previously set amount 
+                it('should approve the requested amount and replaces the previous one if an approval exists', async function() {
+                    // set the first approved amount to 1
+                    await this.token.approve(spender,1, {from: ownerAddress});
+                    // check to make sure the first approval is set
+                    const allowance1 = await this.token.allowance(ownerAddress, spender);
+                    assert.equal(allowance1,1);
+                    // then replace the approve with a new value 
+                    await this.token.approve(spender,amount,{from: ownerAddress});
+                    const allowance2 = await this.token.allowance(ownerAddress, spender);
+                    assert.equal(allowance2,amount);
                 });
             });
         });
@@ -262,7 +233,7 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount,approver]) 
         describe('when the spender is the zero address', function () {
             const spender = ZERO_ADDRESS;
             const amount = 10;
-            it('approves the requested amount and emits an approval event', async function() {
+            it('should approve the requested amount and emits an approval event', async function() {
                 const { logs } = await this.token.approve(spender, amount, { from: ownerAddress });
                 assert.equal(logs.length, 1);
                 assert.equal(logs[0].event, 'Approval');
@@ -285,92 +256,68 @@ contract('XchngToken', async ([ownerAddress,recipient,anotherAccount,approver]) 
 
         describe('when the recipient is not the zero address', function () {
             const to = anotherAccount;
+            const amount = 100;
 
-            describe('when the spender has enough approved balance', function () {
+            it('should transfers the requested amount if the spender is approved and the approver has enough balance', async function () {
+                await this.token.transferFrom(approver, to, amount, { from: spender });
 
-                describe('when the approver has enough balance', function () {
-                    const amount = 100;
+                const senderBalance = await this.token.balanceOf(approver);
+                assert.equal(senderBalance, 0);
 
-                    it('transfers the requested amount', async function () {
-                        await this.token.transferFrom(approver, to, amount, { from: spender });
-
-                        const senderBalance = await this.token.balanceOf(approver);
-                        assert.equal(senderBalance, 0);
-
-                        const recipientBalance = await this.token.balanceOf(to);
-                        assert.equal(recipientBalance, amount);
-                    });
-
-                    it('decreases the spender allowance', async function () {
-                        await this.token.transferFrom(approver, to, amount, { from: spender });
-
-                        const allowance = await this.token.allowance(approver, spender);
-                        assert.equal(allowance, 0);
-                    });
-
-                    it('emits a transfer event', async function () {
-                        const { logs } = await this.token.transferFrom(approver, to, amount, { from: spender });
-
-                        assert.equal(logs.length, 1);
-                        assert.equal(logs[0].event, 'Transfer');
-                        assert.equal(logs[0].args._from, approver);
-                        assert.equal(logs[0].args._to, to);
-                        assert.equal(logs[0].args._value, amount);
-                    });
-                });
-
-                describe('when the approver does not have enough balance', function () {
-                    const amount = 101;
-
-                    it('reverts', async function () {
-                        await assertRevert(this.token.transferFrom(approver, to, amount, { from: spender }));
-                    });
-                });
-
-                describe('when the approver is the zero address', function () {
-                    const amount = 100;
-                    it('reverts', async function () {
-                        await assertRevert(this.token.transferFrom(ZERO_ADDRESS, to, amount, { from: spender }));
-                    });
-                });
+                const recipientBalance = await this.token.balanceOf(to);
+                assert.equal(recipientBalance, amount);
             });
 
-            describe('when the spender does not have enough approved balance', function () {
+            it('should decreases the spender allowance if the spender is approved and the approver has enough balance', async function () {
+                await this.token.transferFrom(approver, to, amount, { from: spender });
+                const allowance = await this.token.allowance(approver, spender);
+                assert.equal(allowance, 0);
+            });
 
-                describe('when the approver has enough balance', function () {
-                    const amount = 100;
+            it('should emit a transfer event if the spender is approved and the approver has enough balance', async function () {
+                const { logs } = await this.token.transferFrom(approver, to, amount, { from: spender });
+                assert.equal(logs.length, 1);
+                assert.equal(logs[0].event, 'Transfer');
+                assert.equal(logs[0].args._from, approver);
+                assert.equal(logs[0].args._to, to);
+                assert.equal(logs[0].args._value, amount);
+            });
 
-                    it('reverts', async function () {
-                        // Override the spenders approved amount
-                        await this.token.approve(spender, 99, { from: approver });
+            it('should revert if the approver does not have enough balance', async function () {
+                const amount = 101;
+                await assertRevert(this.token.transferFrom(approver, to, amount, { from: spender }));
+            });
+                
+            it('should revert if the approver is the zero address', async function () {
+                const amount = 100;
+                await assertRevert(this.token.transferFrom(ZERO_ADDRESS, to, amount, { from: spender }));
+            });
 
-                        await assertRevert(this.token.transferFrom(approver, to, amount, { from: spender }));
-                    });
-                });
+            it('should reverts if the spender does not have an approved balance', async function () {
+                const amount = 100;
+                // Override the spenders approved amount
+                await this.token.approve(spender, 99, { from: approver });
 
-                describe('when the approver does not have enough balance', function () {
-                    const amount = 101;
+                await assertRevert(this.token.transferFrom(approver, to, amount, { from: spender }));
+            });
 
-                    it('reverts', async function () {
-                        await assertRevert(this.token.transferFrom(approver, to, amount, { from: spender }));
-                    });
-                });
+            it('reverts if the spender does not have an approved balance and the approver does not have enough balance', async function () {
+                const amount = 101;
+                await assertRevert(this.token.transferFrom(approver, to, amount, { from: spender }));
             });
         });
 
         describe('when the recipient is the zero address', function () {
             const amount = 100;
             const to = ZERO_ADDRESS;
-
-            it('reverts', async function () {
+            it('should revert', async function () {
                 await assertRevert(this.token.transferFrom(approver, to, amount, { from: spender }));
             });
         });
 
         describe('when the recipient is the Xchng contract address', function () {
             const amount = 100;
-
-            it('reverts', async function () {
+            it('should revert', async function () {
                 await assertRevert(this.token.transferFrom(approver, this.token.address, amount, { from: spender }));
             });
         });
