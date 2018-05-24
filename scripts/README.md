@@ -52,8 +52,9 @@ node scripts/setup.js
 
 | ENV | Default | Description |
 |-----|---------|-------------|
-| WEB3_URL | http://localhost:7545 | By default set to local ganache |
-| CONTRACT_ADDRESS | none | The address of the auction |
+| NODE_ADDR | http://localhost:7545 | By default set to local ganache |
+| MNEMONIC | none | Mnemonic used to generate HDWallet accounts |
+| AUCTION_ADDRESS | none | The address of the auction |
 | TOKEN_ADDRESS | none | The address of the token |
 | NUM_TOKENS_AVAILABLE | '600000000000000000000000000' | The number of Xchng tokens to preallocate |
 
@@ -69,8 +70,9 @@ node scripts/bid.js
 
 | ENV | Default | Description |
 |-----|---------|-------------|
-| WEB3_URL | http://localhost:7545 | By default set to local ganache |
-| CONTRACT_ADDRESS | none | The address of the auction |
+| NODE_ADDR | http://localhost:7545 | By default set to local ganache |
+| MNEMONIC | none | Mnemonic used to generate HDWallet accounts |
+| AUCTION_ADDRESS | none | The address of the auction |
 | TOKEN_ADDRESS | none | The address of the token |
 | FROM_ADDRESS | None | The address to bid from, by default this is 'None' which causes the script to randomly choose one of the ganache addresses to bid from |
 | BID_AMOUNT | '1' | The amount of ETH to bid, this needs to be _at least_ 1 ETH |

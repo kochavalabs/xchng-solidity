@@ -4,21 +4,21 @@ const token = require('../build/contracts/XchngToken.json');
 const HDWalletProvider = require("truffle-hdwallet-provider");
 const { awaitHandler, STAGES } = require('./util');
 
-// Sets the hdwallet based on environment variables
-const mnemonic = process.env.MNEMONIC;
-const node = process.env.NODE_ADDR;
-
-// How many tokens to start with
+// Read the environment variables
+const MNEMONIC = process.env.MNEMONIC; // This must be set
+const NODE_ADDR = process.env.NODE_ADDR || 'http://localhost:7545' ;
+const AUCTION_ADDRESS = process.env.AUCTION_ADDRESS || '';
+const TOKEN_ADDRESS = process.env.TOKEN_ADDRESS || '';
+// How many tokens to start with (Optional environment viarable or 600 Million*10^18)
 const NUM_TOKENS_AVAILABLE = process.env.NUM_TOKENS_AVAILABLE || '600000000000000000000000000';
 
-hdwallet = new HDWalletProvider(mnemonic, node);
+// Sets the hdwallet based on environment variables (Generate 10 account addresses from mnemonic for testing)
+hdwallet = new HDWalletProvider(MNEMONIC, NODE_ADDR, 0, 10);
 
 // Setup the provider
 const web3 = new Web3(hdwallet);
 
 // build the contract using the ABI
-const AUCTION_ADDRESS = process.env.CONTRACT_ADDRESS || '';
-const TOKEN_ADDRESS = process.env.TOKEN_ADDRESS || '';
 const dutchAuction = new web3.eth.Contract(auction.abi, AUCTION_ADDRESS);
 const xchngToken = new web3.eth.Contract(token.abi, TOKEN_ADDRESS);
 
@@ -32,7 +32,7 @@ const getAccounts = async () => {
       console.log('Error getting accounts: ', err);
       process.exit(1);
     }
-  
+
     return accounts;
 };
 
@@ -64,6 +64,19 @@ const getStage = async () => {
     }
 };
 
+const getBalance = async (address) => {
+    let wei;
+    let err;
+  
+    [wei, err] = await awaitHandler(web3.eth.getBalance(address));
+    if (err != null) {
+      console.log('Error getting address balance: ', err);
+      process.exit(1);
+    }
+  
+    return web3.utils.fromWei(wei);
+  };
+
 const whitelist = async (address, owner) => {
     let _;
     let err;
@@ -79,5 +92,5 @@ const whitelist = async (address, owner) => {
   
 
 module.exports = {
-    dutchAuction, xchngToken, NUM_TOKENS_AVAILABLE, AUCTION_ADDRESS, TOKEN_ADDRESS, getAccounts, getStage, whitelist,
+    web3, dutchAuction, xchngToken, NUM_TOKENS_AVAILABLE, AUCTION_ADDRESS, TOKEN_ADDRESS, getAccounts, getStage, getBalance, whitelist,
 }
