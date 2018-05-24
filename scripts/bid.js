@@ -28,12 +28,21 @@ async function bid() {
   console.log('From address', address);
   console.log('Bid amount', amount);
 
-  console.log('Whitelisting', address);
-  await whitelist(address, accounts[0]);
+  // Check if address needs to be whitelisted
+  let err;
+  let iswhitelisted;
+  [iswhitelisted, err] = await awaitHandler(dutchAuction.methods.whitelist(address).call());
+    if (err != null) {
+      console.log('Error getting auction stage: ', err);
+      process.exit(1);
+  }
+  if (!iswhitelisted) {
+    console.log('Whitelisting', address);
+    await whitelist(address, accounts[0]);
+  }
 
   console.log('Submitting Bid from address:', address);
   let transaction;
-  let err;
   [transaction, err] = await awaitHandler(dutchAuction.methods.bid().send({ from: address, value: web3.utils.toWei(amount), gas: 1000000 }));
   if (err != null) {
     console.log('Error submitting bid to auction: ', err);
