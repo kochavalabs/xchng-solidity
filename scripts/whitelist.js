@@ -6,10 +6,10 @@ const {
 async function addToWhitelist(address) {
     const accounts = await getAccounts();
 
-    console.log('Whitelisting address', myArgs[0]);
-    await whitelist(myArgs[0], accounts[0]);
+    console.log('Whitelisting address', address);
+    await whitelist(myArgs[0], address);
 
-    console.log('Account Successfully whitelisted');
+    console.log('Account Successfully whitelisted!');
     process.exit()
 }
 

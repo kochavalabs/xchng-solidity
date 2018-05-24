@@ -32,7 +32,7 @@ async function pause(isToken) {
   }
 
   console.log('');
-  console.log('Contract paused?:', isPaused);
+  console.log('Contract paused?', isPaused);
   process.exit()
 }
 
@@ -53,7 +53,7 @@ async function unpause(isToken) {
       process.exit(1);
     }
   
-    console.log('Pause was successful with transaction:', transaction.transactionHash);
+    console.log('Unpause was successful with transaction:', transaction.transactionHash);
   
     // Check the pause value
     let isPaused;
@@ -64,7 +64,7 @@ async function unpause(isToken) {
     }
   
     console.log('');
-    console.log('Contract paused?:', isPaused);
+    console.log('Contract paused?', isPaused);
     process.exit()
 }
 
