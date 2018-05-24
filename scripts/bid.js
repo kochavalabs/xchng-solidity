@@ -1,8 +1,8 @@
 /* eslint no-unused-vars: "off", prefer-const: "off" */
 const { awaitHandler, STAGES } = require('./util');
 const {
-  web3, dutchAuction, xchngToken, AUCTION_ADDRESS, TOKEN_ADDRESS, NUM_TOKENS_AVAILABLE, getStage, getAccounts, getBalance, whitelist, estimateGas,
-} = require('./web3');
+  web3, dutchAuction, xchngToken, AUCTION_ADDRESS, TOKEN_ADDRESS, NUM_TOKENS_AVAILABLE, getStage, getAccounts, getBalance, whitelist,
+} = require('./hdwallet');
 
 let address = process.env.FROM_ADDRESS || 'None';
 const amount = process.env.BID_AMOUNT || '1';
@@ -31,7 +31,7 @@ async function bid() {
   console.log('Whitelisting', address);
   await whitelist(address, accounts[0]);
 
-  console.log('Submitting Bid');
+  console.log('Submitting Bid from address:', address);
   let transaction;
   let err;
   [transaction, err] = await awaitHandler(dutchAuction.methods.bid().send({ from: address, value: web3.utils.toWei(amount), gas: 1000000 }));
@@ -58,6 +58,7 @@ async function bid() {
   console.log(`Sender ${address} balance (ETH): ${senderBalance}`);
   console.log(`Owner ${accounts[0]} balance (ETH): ${ownerBalance}`);
   console.log('Contract received wei:', receivedWei);
+  process.exit()
 }
 
 console.log('Running bid submission');

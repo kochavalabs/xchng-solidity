@@ -33,6 +33,7 @@ async function pause(isToken) {
 
   console.log('');
   console.log('Contract paused?:', isPaused);
+  process.exit()
 }
 
 async function unpause(isToken) {
@@ -64,6 +65,7 @@ async function unpause(isToken) {
   
     console.log('');
     console.log('Contract paused?:', isPaused);
+    process.exit()
 }
 
 // Check for pause or unpause

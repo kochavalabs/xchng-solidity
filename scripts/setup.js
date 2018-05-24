@@ -13,7 +13,7 @@ async function setup() {
   // Get the accounts
   const accounts = await getAccounts();
 
-  console.log('Approving the auction on the Token');
+  console.log('Approving the auction on the Token using account address:', accounts[0]);
   // Approve the dutch action for managing Xchng Token
   [_, err] = await awaitHandler(xchngToken.methods.approve(AUCTION_ADDRESS, NUM_TOKENS_AVAILABLE).send({ from: accounts[0], gas: 1000000 }));
   if (err != null) {
@@ -53,6 +53,7 @@ async function setup() {
   }
 
   console.log('Setup complete');
+  process.exit()
 }
 
 console.log('Running setup');

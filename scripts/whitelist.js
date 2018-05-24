@@ -10,6 +10,7 @@ async function addToWhitelist(address) {
     await whitelist(myArgs[0], accounts[0]);
 
     console.log('Account Successfully whitelisted');
+    process.exit()
 }
 
 var myArgs = process.argv.slice(2);
