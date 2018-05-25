@@ -33,7 +33,7 @@ async function bid() {
   let iswhitelisted;
   [iswhitelisted, err] = await awaitHandler(dutchAuction.methods.whitelist(address).call());
     if (err != null) {
-      console.log('Error getting auction stage: ', err);
+      console.log('Error checking whitelist: ', err);
       process.exit(1);
   }
   if (!iswhitelisted) {
