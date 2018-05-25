@@ -1,16 +1,31 @@
 /* eslint no-unused-vars: "off", prefer-const: "off" */
+const { awaitHandler } = require('./util');
 const {
-  getAccounts, whitelist,
+  getAccounts, whitelist, dutchAuction,
 } = require('./hdwallet');
 
 async function addToWhitelist(address) {
-    const accounts = await getAccounts();
+  // Check if address needs to be whitelisted
+  let err;
+  let iswhitelisted;
+  [iswhitelisted, err] = await awaitHandler(dutchAuction.methods.whitelist(address).call());
+  if (err != null) {
+    console.log('Error checking whitelist: ', err);
+    process.exit(1);
+  }
 
-    console.log('Whitelisting address', address);
-    await whitelist(myArgs[0], address);
-
-    console.log('Account Successfully whitelisted!');
+  if (iswhitelisted) {
+    console.log('Address is already whitelisted');
     process.exit()
+  }
+
+  const accounts = await getAccounts();
+
+  console.log('Whitelisting address', address);
+  await whitelist(address, accounts[0]);
+
+  console.log('Account Successfully whitelisted');
+  process.exit()
 }
 
 var myArgs = process.argv.slice(2);
