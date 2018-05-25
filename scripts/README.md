@@ -1,6 +1,10 @@
-## Running Scripts to test Dutch Auction in Ganache
+## Running Scripts to test Dutch Auction
 
 In order to help run, manage, and interact with the Token and Auction contract there are a couple helper scripts in the `scripts/` directory. Once the contracts have been deployed, you can run these scripts to interact with them. ENV vars can be used to configure these scripts. NOTE: Contract addresses are deterministic, which means if you deploy the contracts for the first time to a fresh ganache instance the addresses for those contracts will be the same each time.
+
+It is also possible to use these scripts to test contracts on Ropsten testnet by setting the `MNEMONIC` for the hdwallet and `NODE_ADDRESS` to a Ropsten testnet node.
+
+It is **NOT** recommended to try using these scripts on the main Ethereum network as the commands will require the use of Ether for gas and have not been optimized for gas usage.
 
 First make sure the truffle migrations have been deployed to the ganache network:
 
