@@ -1,8 +1,8 @@
 /* eslint no-unused-vars: "off", prefer-const: "off" */
 const { awaitHandler, STAGES } = require('./util');
 const {
-  web3, dutchAuction, xchngToken, AUCTION_ADDRESS, TOKEN_ADDRESS, NUM_TOKENS_AVAILABLE, getStage, getAccounts, getBalance, whitelist, estimateGas,
-} = require('./web3');
+  web3, dutchAuction, xchngToken, AUCTION_ADDRESS, TOKEN_ADDRESS, NUM_TOKENS_AVAILABLE, getStage, getAccounts, getBalance, whitelist,
+} = require('./hdwallet');
 
 let address = process.env.FROM_ADDRESS || 'None';
 const amount = process.env.BID_AMOUNT || '1';
@@ -28,12 +28,21 @@ async function bid() {
   console.log('From address', address);
   console.log('Bid amount', amount);
 
-  console.log('Whitelisting', address);
-  await whitelist(address, accounts[0]);
-
-  console.log('Submitting Bid');
-  let transaction;
+  // Check if address needs to be whitelisted
   let err;
+  let iswhitelisted;
+  [iswhitelisted, err] = await awaitHandler(dutchAuction.methods.whitelist(address).call());
+    if (err != null) {
+      console.log('Error checking whitelist: ', err);
+      process.exit(1);
+  }
+  if (!iswhitelisted) {
+    console.log('Whitelisting', address);
+    await whitelist(address, accounts[0]);
+  }
+
+  console.log('Submitting Bid from address:', address);
+  let transaction;
   [transaction, err] = await awaitHandler(dutchAuction.methods.bid().send({ from: address, value: web3.utils.toWei(amount), gas: 1000000 }));
   if (err != null) {
     console.log('Error submitting bid to auction: ', err);
@@ -58,6 +67,7 @@ async function bid() {
   console.log(`Sender ${address} balance (ETH): ${senderBalance}`);
   console.log(`Owner ${accounts[0]} balance (ETH): ${ownerBalance}`);
   console.log('Contract received wei:', receivedWei);
+  process.exit()
 }
 
 console.log('Running bid submission');
