@@ -113,3 +113,19 @@ node scripts/whitelist.js [Address]
 | NODE_ADDR | http://localhost:7545 | By default set to local ganache |
 | MNEMONIC | none | Mnemonic used to generate HDWallet accounts |
 | AUCTION_ADDRESS | none | The address of the auction |
+
+### Price Check
+
+The pricecheck script will check the current price and missing funds for the Dutch Auction contract.  These are both `view` level functions on the contract and should return immediatly without submitting a transaction.
+
+```
+node pricecheck.js
+```
+
+#### Configuration
+
+| ENV | Default | Description |
+|-----|---------|-------------|
+| NODE_ADDR | http://localhost:7545 | By default set to local ganache |
+| MNEMONIC | none | Mnemonic used to generate HDWallet accounts |
+| AUCTION_ADDRESS | none | The address of the auction |
